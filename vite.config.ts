@@ -4,6 +4,7 @@ import react from '@vitejs/plugin-react'
 // https://vitejs.dev/config/
 export default defineConfig({
   plugins: [react()],
-  // Empty string base allows the app to be served from a subdirectory (like GitHub Pages)
-  base: '', 
+  // Use './' to ensure all asset paths are relative to the current directory.
+  // This is essential for GitHub Pages where the app is served from a subdirectory (e.g., /repo-name/).
+  base: './', 
 })

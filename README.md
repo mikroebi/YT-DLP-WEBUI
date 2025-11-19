@@ -1,2 +1,20 @@
-<<<<<<<, ==[[12](https://www.google.com/url?sa=E&q=https%3A%2F%2Fvertexaisearch.cloud.google.com%2Fgrounding-api-redirect%2FAUZIYQHQYyA0Xnk1Y3FBRkF4KdqhP2h6Q1_DaezS3JxfZGpUt8l5ku0mLeBr2CJvGCKU7b4X3D7c8BYvvNN2_Zc-dD6e-IGD6bclgYyQSJuCCFR-7q083Pok9m8yBW8fJFZgFuY7rakkmvwSdfv51c64hM7JOUsZLf6laVlX93Dv1DCi)][[13](https://www.google.com/url?sa=E&q=https%3A%2F%2Fvertexaisearch.cloud.google.com%2Fgrounding-api-redirect%2FAUZIYQG1Z77plq2Cl8BpkNCLGcp9MLFtpPYkF4ex52bGskR81_-Aue0VpKvPEM6CjGg9XHj2LJbjmVOpbfv2hcBOYblckFKPdmYeFzMsXAJycLuSBTz4q0H8VT3w27g-z0ryDJjTBmMgx86syxGuovVbM7vIuWPGRw_n)]=====
-https://aistudio.google.com/app
+<div align="center">
+<img width="1200" height="475" alt="GHBanner" src="https://github.com/user-attachments/assets/0aa67016-6eaf-458a-adb2-6e31a0763ed6" />
+</div>
+
+# Run and deploy your AI Studio app
+
+This contains everything you need to run your app locally.
+
+View your app in AI Studio: https://ai.studio/apps/drive/1o8PU9tiqWpTEnaDlNmOnMJdLmHwaYRrv
+
+## Run Locally
+
+**Prerequisites:**  Node.js
+
+
+1. Install dependencies:
+   `npm install`
+2. Set the `GEMINI_API_KEY` in [.env.local](.env.local) to your Gemini API key
+3. Run the app:
+   `npm run dev`
