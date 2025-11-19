@@ -1,11 +1,2 @@
-<div align="center">
-
-<img width="1200" height="475" alt="GHBanner" src="https://github.com/user-attachments/assets/0aa67016-6eaf-458a-adb2-6e31a0763ed6" />
-
-  <h1>Built with AI Studio</h2>
-
-  <p>The fastest path from prompt to production with Gemini.</p>
-
-  <a href="https://aistudio.google.com/apps">Start building</a>
-
-</div>
+<<<<<<<, ==[[12](https://www.google.com/url?sa=E&q=https%3A%2F%2Fvertexaisearch.cloud.google.com%2Fgrounding-api-redirect%2FAUZIYQHQYyA0Xnk1Y3FBRkF4KdqhP2h6Q1_DaezS3JxfZGpUt8l5ku0mLeBr2CJvGCKU7b4X3D7c8BYvvNN2_Zc-dD6e-IGD6bclgYyQSJuCCFR-7q083Pok9m8yBW8fJFZgFuY7rakkmvwSdfv51c64hM7JOUsZLf6laVlX93Dv1DCi)][[13](https://www.google.com/url?sa=E&q=https%3A%2F%2Fvertexaisearch.cloud.google.com%2Fgrounding-api-redirect%2FAUZIYQG1Z77plq2Cl8BpkNCLGcp9MLFtpPYkF4ex52bGskR81_-Aue0VpKvPEM6CjGg9XHj2LJbjmVOpbfv2hcBOYblckFKPdmYeFzMsXAJycLuSBTz4q0H8VT3w27g-z0ryDJjTBmMgx86syxGuovVbM7vIuWPGRw_n)]=====
+https://aistudio.google.com/app

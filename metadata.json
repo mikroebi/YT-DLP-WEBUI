@@ -1,0 +1,5 @@
+{
+  "name": "YTDL-Web-UI",
+  "description": "A modern, dark-themed React implementation of a YouTube Downloader interface featuring playlist detection, format selection, and background progress visualization.",
+  "requestFramePermissions": []
+}
