@@ -19,4 +19,5 @@ export interface VideoData {
 export interface AppSettings {
   downloadDir: string;
   cookiesLoaded: boolean;
+  browser?: string; // Added for command generation
 }

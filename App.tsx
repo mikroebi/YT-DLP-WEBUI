@@ -1,22 +1,38 @@
-
 import React, { useState, useCallback, useEffect } from 'react';
 import ControlPanel from './components/ControlPanel';
 import VideoRow from './components/VideoRow';
 import { VideoData, AppSettings, Format, Quality } from './types';
 import { fetchVideoMetadata } from './services/mockYoutubeService';
+import { Terminal, Copy, Check } from 'lucide-react';
 
 const App: React.FC = () => {
   // State
   const [videos, setVideos] = useState<VideoData[]>([]);
   const [isFetching, setIsFetching] = useState(false);
   const [settings, setSettings] = useState<AppSettings>({
-    downloadDir: '/home/user/Downloads/YouTube Downloader',
+    downloadDir: 'D:\\YT-DLP/U',
     cookiesLoaded: false,
+    browser: 'firefox'
   });
+  const [lastCommand, setLastCommand] = useState<string>('');
+  const [copied, setCopied] = useState(false);
   
   // Queue Management State
   const [activeDownloadId, setActiveDownloadId] = useState<string | null>(null);
   const [queue, setQueue] = useState<string[]>([]);
+
+  // Helper: Generate the exact yt-dlp command requested by the user
+  const generateYtDlpCommand = (video: VideoData) => {
+    const qualityMap: Record<string, string> = {
+      '480p': '480',
+      '720p': '720',
+      '1080p': '1080'
+    };
+    const h = qualityMap[video.quality] || '720';
+    
+    // Command construction based on user request
+    return `yt-dlp -P "${settings.downloadDir}" --embed-thumbnail --merge-output-format mp4 --write-subs --sub-langs "en,fa" --cookies-from-browser ${settings.browser} -f "bv*[height<=${h}]+ba/b[height<=${h}] / wv*+ba/w" -o "%(uploader)s-%(upload_date>%Y-%m-%d)s - %(title)s.%(ext)s" "https://www.youtube.com/watch?v=${video.id}"`;
+  };
 
   // Simulate Download Process
   useEffect(() => {
@@ -28,17 +44,14 @@ const App: React.FC = () => {
           return prevVideos.map((vid) => {
             if (vid.id !== activeDownloadId) return vid;
             
-            // Do not progress if paused
             if (vid.status === 'paused') return vid;
 
             const newProgress = vid.progress + (Math.random() * 5 + 1);
             
             if (newProgress >= 100) {
-              // Finished
               return { ...vid, progress: 100, status: 'finished', speed: '0 MB/s' };
             }
             
-            // Update speed randomly
             const speeds = ['2.5 MB/s', '5.1 MB/s', '8.4 MB/s', '12.0 MB/s'];
             const randomSpeed = speeds[Math.floor(Math.random() * speeds.length)];
             
@@ -51,16 +64,12 @@ const App: React.FC = () => {
     return () => clearInterval(progressInterval);
   }, [activeDownloadId]);
 
-  // Monitor completion to trigger next in queue
+  // Monitor completion
   useEffect(() => {
     if (!activeDownloadId) return;
-
     const activeVideo = videos.find(v => v.id === activeDownloadId);
-    
-    // Check if current download is finished
     if (activeVideo?.status === 'finished') {
       setActiveDownloadId(null);
-      // Check queue
       if (queue.length > 0) {
         const [nextId, ...remainingQueue] = queue;
         setQueue(remainingQueue);
@@ -73,25 +82,20 @@ const App: React.FC = () => {
   // Handlers
   const handleFetch = async (urlOrUrls: string | string[]) => {
     setIsFetching(true);
-    setVideos([]); // Clear previous results
+    setVideos([]); 
     
     try {
       let newVideos: VideoData[] = [];
-      
       if (Array.isArray(urlOrUrls)) {
-        // Batch processing for text file lines
         for (const url of urlOrUrls) {
           if (!url.trim()) continue;
           const result = await fetchVideoMetadata(url);
-          // Ensure IDs are unique when adding multiple
           const timestampedResult = result.map(v => ({...v, id: v.id + '-' + Date.now() + Math.random()}));
           newVideos = [...newVideos, ...timestampedResult];
         }
       } else {
-        // Single URL processing
         newVideos = await fetchVideoMetadata(urlOrUrls);
       }
-      
       setVideos(newVideos);
     } catch (err) {
       console.error(err);
@@ -114,6 +118,14 @@ const App: React.FC = () => {
   }, []);
 
   const startDownload = (id: string) => {
+    const video = videos.find(v => v.id === id);
+    if (video) {
+      const cmd = generateYtDlpCommand(video);
+      setLastCommand(cmd);
+      // Try to copy to clipboard automatically
+      navigator.clipboard.writeText(cmd).catch(() => {});
+    }
+
     setVideos(prev => prev.map(v => v.id === id ? { ...v, status: 'downloading', progress: 0 } : v));
     setActiveDownloadId(id);
   };
@@ -121,22 +133,15 @@ const App: React.FC = () => {
   const handleTogglePause = (id: string) => {
     setVideos(prev => prev.map(v => {
       if (v.id !== id) return v;
-      
-      // Toggle between downloading and paused
-      if (v.status === 'downloading') {
-        return { ...v, status: 'paused' };
-      } else if (v.status === 'paused') {
-        return { ...v, status: 'downloading' };
-      }
+      if (v.status === 'downloading') return { ...v, status: 'paused' };
+      else if (v.status === 'paused') return { ...v, status: 'downloading' };
       return v;
     }));
   };
 
   const handleSingleDownload = (id: string) => {
     if (activeDownloadId) {
-      // Add to queue if something is already downloading
       setQueue(prev => [...prev, id]);
-      // Visual cue could be added for 'queued'
     } else {
       startDownload(id);
     }
@@ -155,12 +160,17 @@ const App: React.FC = () => {
   };
 
   const handleStopQueue = () => {
-    setQueue([]); // Clear queue
-    // The active download continues until finished, but no new ones start
+    setQueue([]);
   };
 
   const handleOpen = (id: string) => {
-    alert(`Opening file for video ID: ${id}\nPath: ${settings.downloadDir}`);
+    alert(`In a real app, this would open: ${settings.downloadDir}`);
+  };
+
+  const copyCommandToClipboard = () => {
+    navigator.clipboard.writeText(lastCommand);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
   };
 
   return (
@@ -176,7 +186,7 @@ const App: React.FC = () => {
         isQueueRunning={queue.length > 0}
       />
 
-      <div className="flex-1 overflow-y-auto p-4 scroll-smooth">
+      <div className="flex-1 overflow-y-auto p-4 scroll-smooth pb-24">
         {videos.length === 0 && !isFetching && (
           <div className="h-full flex flex-col items-center justify-center text-zinc-600 gap-4">
             <div className="p-6 rounded-full bg-zinc-800/50 border-4 border-zinc-800">
@@ -189,7 +199,7 @@ const App: React.FC = () => {
         {isFetching && (
            <div className="h-full flex flex-col items-center justify-center text-zinc-500 gap-3">
              <div className="w-8 h-8 border-2 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
-             <p>Analyzing...</p>
+             <p>Analyzing Playlist...</p>
            </div>
         )}
 
@@ -207,6 +217,26 @@ const App: React.FC = () => {
           ))}
         </div>
       </div>
+
+      {/* Command Preview Footer */}
+      {lastCommand && (
+        <div className="fixed bottom-0 left-0 right-0 bg-zinc-950 border-t border-zinc-800 p-3 z-30">
+          <div className="max-w-5xl mx-auto flex items-center gap-3">
+            <Terminal size={20} className="text-blue-400 shrink-0" />
+            <div className="flex-1 font-mono text-xs text-zinc-400 truncate">
+              <span className="text-zinc-500 select-none">$ </span>
+              {lastCommand}
+            </div>
+            <button 
+              onClick={copyCommandToClipboard}
+              className="bg-zinc-800 hover:bg-zinc-700 text-white px-3 py-1.5 rounded text-xs flex items-center gap-2 transition-colors border border-zinc-700"
+            >
+              {copied ? <Check size={14} className="text-green-400" /> : <Copy size={14} />}
+              {copied ? 'Copied' : 'Copy Command'}
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
